@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from preprocess import audio_spec, spec_audio, audio_files_to_numpy 
 from model import model_out
+from werkzeug.utils import secure_filename
 
 raw_audio = []
 
@@ -24,12 +25,14 @@ def send_audio():
 @app.route("/recieveaudio", methods = ["GET", "POST"])
 def recieve_audio():
     global raw_audio
+
     if request.method == "POST":
-        f = request.files['files']
-        raw_audio = audio_files_to_numpy(f, sample_rate = 8000, 
-                    frame_length = 8064, hop_length_frame= 8064, min_duration = 1.0)
-      
-    return type(f)
+        f = open('./file.wav', 'wb')
+        f.write(request.get_data("audio_data"))
+        f.close()    
+        
+        
+    return raw_audio
 
 
 

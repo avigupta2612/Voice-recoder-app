@@ -94,16 +94,16 @@ def audio_spec(audio_array):
                                     audio_array, dim_square_spec = int(255 / 2) + 1, n_fft = 255, 
                                     hop_length_fft = 63)
     m_amp_db_voice = m_amp_db_voice.reshape(m_amp_db_voice.shape[0],1,128,128)
-    m_amp_db_voice = (m_amp_db_voice + 43) / 50
+    m_amp_db_voice = (m_amp_db_voice + 46) / 50
 
     return m_amp_db_voice, m_pha_voice
 
 def spec_audio(spec_img, spec_phase):
-    spec_img = spec_img*50 - 46
+    spec_img = 50 * spec_img - 46
     numpy_audio = matrix_spectrogram_to_numpy_audio(spec_img, spec_phase, 
-                                                    frame_length = 8064, hop_length_fft = 8064)
+                                                    frame_length = 8064, hop_length_fft = 63)
     array_output = numpy_audio.reshape(1,numpy_audio.shape[0]*8064) * 10
-    sf.write('/output/'+'clean_audio.wav', array_output[0,:], sample_rate = 8000)                                
+    sf.write('clean_audio.wav', array_output[0,:], 8000)                                
     file_path = '/output/clean_audio.wav'
     return "abc"
 

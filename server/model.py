@@ -54,7 +54,7 @@ class DenoisingModel(nn.Module):
         return x
 
 def model_out(spec_array, model='unet'):
-    train_on_gpu = True if torch.cuda().is_available() else False
+    train_on_gpu = True if torch.cuda.is_available() else False
     cnn_auto_path = r'C:\Users\Avi\Desktop\speech denoising\model.pt'
     unet_path = r'C:\Users\Avi\Desktop\speech denoising\unet-1.pt'
 
@@ -65,17 +65,17 @@ def model_out(spec_array, model='unet'):
         if train_on_gpu:
             cnn_auto_model.cuda()
             model_inp = model_inp.cuda()
-        model_out = cnn_auto_model(model_inp)
+        model_out = cnn_auto_model(model_inp.float())
         output = model_inp().numpy().squeeze() - model_out().detach().cpu().numpy().squeeze()
         return output
     else:
-        unet = torch.load(unet_path)
+        unet = torch.load(unet_path, map_location=torch.device('cpu'))
         model_inp = torch.from_numpy(spec_array)
         if train_on_gpu:
             unet.cuda()
             model_inp = model_inp.cuda()
-        model_out = unet(model_inp)
-        output = model_inp().numpy().squeeze() - model_out().detach().cpu().numpy().squeeze()
+        model_out = unet(model_inp.float())
+        output = model_inp.numpy().squeeze() - model_out.detach().cpu().numpy().squeeze()
         return output
 
        
