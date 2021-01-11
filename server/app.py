@@ -15,7 +15,7 @@ def send_response():
     return "1"
 @app.route("/get_clean_audio", methods = ["GET"])
 def send_audio():
-    raw_audio = audio_files_to_numpy(['../localDB/uploadedAudio/file.wav'], 8000, 8064, 8064, 1.0)
+    raw_audio = audio_files_to_numpy(['./localDB/uploadedAudio/file.wav'], 8000, 8064, 8064, 1.0)
     amp_spec, phase_spec = audio_spec(raw_audio)
     model_output = model_out(amp_spec)
     clean_audio = spec_audio(model_output, phase_spec)
@@ -25,7 +25,7 @@ def send_audio():
 def recieve_audio():
     if request.method == "POST":
         f = request.files['audio_data']
-        with open('../localDB/uploadedAudio/file.wav', 'wb') as audio:
+        with open('./localDB/uploadedAudio/file.wav', 'wb') as audio:
             f.save(audio)
         return 'success'
 
