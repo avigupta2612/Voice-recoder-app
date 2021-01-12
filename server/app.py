@@ -34,15 +34,15 @@ def send_audio():
 def recieve_audio():
     if request.method == "POST":
         f = request.files['audio_data']
-        with open(os.path.join(UPLOAD_DIRECTORY, 'file.wav'), 'wb') as audio:
+        with open(os.path.join(UPLOAD_DIRECTORY, f.filename), 'wb') as audio:
             f.save(audio)
         raw_audio = audio_files_to_numpy(
-            [os.path.join(UPLOAD_DIRECTORY, 'file.wav')], 8000, 8064, 8064, 1.0)
+            [os.path.join(UPLOAD_DIRECTORY, f.filename)], 8000, 8064, 8064, 1.0)
         amp_spec, phase_spec = audio_spec(raw_audio)
         model_output = model_out(amp_spec)
-        clean_audio = spec_audio(model_output, phase_spec)
-        return jsonify(url=send_from_directory(os.path.join(DOWNLOAD_DIRECTORY, clean_audio))
-
+        clean_audio = spec_audio(model_output, phase_spec, f.filename)
+        #return send_from_directory(DOWNLOAD_DIRECTORY, clean_audio, as_attachment=True)
+        return jsonify(url=os.path.join(DOWNLOAD_DIRECTORY+'/'+clean_audio))
 
 if __name__ == '__main__':
     app.run()
