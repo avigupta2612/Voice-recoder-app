@@ -45,7 +45,7 @@
               <div v-if="!item.outputFile">
                 <CSpinner color="info"/>
               </div>
-              <audio v-else controls src=""/>
+              <audio v-else controls :src="item.outputFile"/>
             </td>
           </template>
         </CDataTable>
@@ -56,6 +56,7 @@
 <script>
 const MicRecorder = require("mic-recorder-to-mp3");
 import { ajaxCallMixin } from "@/mixins/HttpCommon";
+import constants from '../constant';
 export default {
   name: "Recorder",
   mixins: [ajaxCallMixin],
@@ -106,6 +107,9 @@ export default {
         { key: "outputAudio", label: "Output Audio", filter: false },
       ];
     },
+    baseUrl() {
+      return constants.apiUrl;
+    }
   },
   mounted() {
     this.recorder = new MicRecorder({
@@ -143,7 +147,6 @@ export default {
               lastModified: Date.now(),
             }
           );
-          console.log(audioFile);
           this.handleUpload(audioFile,this.recordingCount -1);
           this.recordingList.push({
             name: `Recording-${this.recordingCount}`,
@@ -183,16 +186,13 @@ export default {
     handleUpload(file, index) {
       this.fields["audio_data"] = file;
       this.uploadInProgress = true;
-      console.log(index);
-      setTimeout(()=> {
-        this.recordingList[index].outputFile = true;
-      },5000);
-     /* const url = "/upload_audio";
+      const url = "/upload_audio";
       const data = { recordingId: index };
-      this.ajaxCall(url, data, this.handleUploadResponse, this.fields); */
+      this.ajaxCall(url, data, this.handleUploadResponse, this.fields);
     },
     handleUploadResponse(apiResponse) {
-      console.log(apiResponse);
+      this.uploadInProgress = false;
+      this.recordingList[apiResponse.recordingId].outputFile = this.baseUrl+apiResponse.url;
     },
   },
 };

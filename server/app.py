@@ -42,7 +42,7 @@ def recieve_audio():
         model_output = model_out(amp_spec)
         clean_audio = spec_audio(model_output, phase_spec, f.filename)
         # return send_from_directory(DOWNLOAD_DIRECTORY, clean_audio, as_attachment=True)
-        filePath = '/Voice-recoder-app/localDB/uploadedAudio/' + clean_audio
+        filePath = '/Voice-recoder-app/localDB/cleanAudio/' + clean_audio
         return jsonify(url=filePath)
 
 
