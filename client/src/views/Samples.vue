@@ -9,12 +9,12 @@
       >
         <template #audio="{ item }">
           <td class="py-2">
-            <audio controls :src="getUrl(item.noiseTypeinputFile)" />
+            <audio controls :src="getUrl(`${item.noiseType}/originalAudio.wav`)" />
           </td>
         </template>
         <template #outputAudio="{ item }">
           <td class="py-2 postion-relative">
-            <audio controls :src="getUrl(item.File)" />
+            <audio controls :src="getUrl(`${item.noiseType}/cleanAudio.wav`)" />
           </td>
         </template>
       </CDataTable>
@@ -22,12 +22,16 @@
   </CCard>
 </template>
 <script>
+import constants from '../constant';
 export default {
   name: "Samples",
   data() {
       return {
         sampleRecordingList: [
-            //{noiseType:"Siren",audio:"",outputAudio:""},
+            {noiseType:"Children"},
+            {noiseType:"Drilling"},
+            {noiseType:"Siren"},
+            {noiseType:"Street_music"},
         ]
       }
   },
@@ -39,9 +43,14 @@ export default {
         { key: "outputAudio", label: "Output Audio", filter: false },
       ];
     },
+    baseUrl() {
+      return `${constants.apiUrl}/Voice-recoder-app/localDB/samples`;
+    }
   },
   methods: {
-
+    getUrl(suffixPath) {
+      return this.baseUrl+"/"+suffixPath;
+    }
   },
 };
 </script>
