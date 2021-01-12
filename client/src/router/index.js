@@ -8,9 +8,10 @@ Vue.use(Router);
 const Container = () => import('@/components/Container')
 
 //Views
-const Landing = () => import('@/views/Landing')
+// const Landing = () => import('@/views/Landing')
 const Recorder = () => import('@/views/Recorder')
 const Uploader = () => import('@/views/Uploader')
+const Samples = () => import('@/views/Samples')
 
 export default new Router ({
     mode :'history',
@@ -20,20 +21,25 @@ export default new Router ({
             name: 'Container',
             component: Container,
             children: [
-                {
+                /* {
                     path: '/',
                     name: 'Landing',
                     component: Landing
-                },
+                },*/
                 {
                     path: '/upload',
                     name: 'Uploader',
                     component: Uploader
                 },
                 {
-                    path: '/record',
+                    path: '/',
                     name: 'Recorder',
                     component: Recorder
+                },
+                {
+                    path: '/samples',
+                    name: 'Samples',
+                    component: Samples
                 }
             ]
         }
