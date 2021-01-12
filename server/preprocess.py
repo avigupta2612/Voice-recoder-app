@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import librosa
 import soundfile as sf
 
@@ -89,7 +90,7 @@ def matrix_spectrogram_to_numpy_audio(m_mag_db, m_phase, frame_length, hop_lengt
     return np.vstack(list_audio)
 
 def audio_spec(audio_array):
-    print(audio_array)
+    #print(audio_array)
     m_amp_db_voice,  m_pha_voice = numpy_audio_to_matrix_spectrogram(
                                     audio_array, dim_square_spec = int(255 / 2) + 1, n_fft = 255, 
                                     hop_length_fft = 63)
@@ -98,13 +99,15 @@ def audio_spec(audio_array):
 
     return m_amp_db_voice, m_pha_voice
 
-def spec_audio(spec_img, spec_phase):
+def spec_audio(spec_img, spec_phase, filename):
+    DOWNLOAD_DIRECTORY = "../localDB/cleanAudio"
     spec_img = 50 * spec_img - 46
     numpy_audio = matrix_spectrogram_to_numpy_audio(spec_img, spec_phase, 
                                                     frame_length = 8064, hop_length_fft = 63)
     array_output = numpy_audio.reshape(1,numpy_audio.shape[0]*8064) * 10
-    sf.write('./localDB/cleanAudio/clean_audio.wav', array_output[0,:], 8000)                                
-    return 'clean_audio.wav'
+
+    sf.write(os.path.join(DOWNLOAD_DIRECTORY,filename[:-4]+'_clean_audio.wav'), array_output[0,:], 8000)                                
+    return filename[:-4]+'_clean_audio.wav'
 
     
 
