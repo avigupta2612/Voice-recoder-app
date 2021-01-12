@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="mb-4">VOICE RECORDER</h1>
+    <h1 class="mb-2">VOICE RECORDER</h1>
     <CCard>
       <CCardBody>
         <div class="record-box">
@@ -33,13 +33,21 @@
         <CDataTable
           hover
           :items="this.recordingList"
-          :fields="getRecordingListHeaders()"
+          :fields="getRecordingListHeaders"
         >
-        <template #audio="{ item }">
-          <td class="py-2">
-            <audio controls :src="getUrl(item.file)" />
-          </td>
-        </template>
+          <template #audio="{ item }">
+            <td class="py-2">
+              <audio controls :src="getUrl(item.inputFile)" />
+            </td>
+          </template>
+          <template #outputAudio="{ item }">
+            <td class="py-2 postion-relative">
+              <div v-if="!item.outputFile">
+                <CSpinner color="info"/>
+              </div>
+              <audio v-else controls src=""/>
+            </td>
+          </template>
         </CDataTable>
       </CCardBody>
     </CCard>
@@ -62,6 +70,7 @@ export default {
       audioFile: null,
       isRunning: true,
       recordingCount: 1,
+      uploadInProgress: false,  
       minutes: 0,
       secondes: 0,
       time: 0,
@@ -90,6 +99,13 @@ export default {
       const secondes = Math.round((time - minutes) * 60);
       return minutes + ":" + secondes;
     },
+    getRecordingListHeaders() {
+      return [
+        { key: "name", label: "Name", filter: false },
+        { key: "audio", label: "Input Audio", filter: false },
+        { key: "outputAudio", label: "Output Audio", filter: false },
+      ];
+    },
   },
   mounted() {
     this.recorder = new MicRecorder({
@@ -97,15 +113,8 @@ export default {
     });
   },
   methods: {
-    getRecordingListHeaders() {
-      return [
-          { key: "name", label: "Name", filter: false },
-          { key: "createdAt", label: "Created At", filter: false },
-          { key: "audio" , label: "Audio", filter:false}
-      ];
-    },
     getUrl(file) {
-        return URL.createObjectURL(file);
+      return URL.createObjectURL(file);
     },
     startRecording() {
       this.recorder
@@ -126,16 +135,21 @@ export default {
           this.resetTimer();
 
           this.recordingInProcess = false;
-          const audioFile = new File(buffer, `recording_${this.recordingCount}.mp3`, {
-            type: blob.type,
-            lastModified: Date.now(),
-          });
+          const audioFile = new File(
+            buffer,
+            `recording_${this.recordingCount}.mp3`,
+            {
+              type: blob.type,
+              lastModified: Date.now(),
+            }
+          );
           console.log(audioFile);
+          this.handleUpload(audioFile,this.recordingCount -1);
           this.recordingList.push({
-              name: audioFile.name,
-              file: audioFile,
-              createdAt: audioFile.lastModifiedDate.toLocaleTimeString(),
-              
+            name: `Recording-${this.recordingCount}`,
+            inputFile: audioFile,
+            //createdAt: audioFile.lastModifiedDate.toLocaleTimeString(),
+            outputFile: null,
           });
           this.recordingCount++;
         });
@@ -166,14 +180,16 @@ export default {
       this.secondes = 0;
       this.minutes = 0;
     },
-    handleUpload(event) {
-      const selectedFile = event.target.files[0];
-      this.fileName = selectedFile.name;
-      this.fields["audio_data"] = selectedFile;
+    handleUpload(file, index) {
+      this.fields["audio_data"] = file;
       this.uploadInProgress = true;
-      const url = "/upload_audio";
-      const data = {};
-      this.ajaxCall(url, data, this.handleUploadResponse, this.fields);
+      console.log(index);
+      setTimeout(()=> {
+        this.recordingList[index].outputFile = true;
+      },5000);
+     /* const url = "/upload_audio";
+      const data = { recordingId: index };
+      this.ajaxCall(url, data, this.handleUploadResponse, this.fields); */
     },
     handleUploadResponse(apiResponse) {
       console.log(apiResponse);
@@ -183,7 +199,7 @@ export default {
 </script>
 <style scoped>
 .record-box {
-  height: 300px;
+  height: 200px;
   width: 100%;
   display: flex;
   justify-content: center;
