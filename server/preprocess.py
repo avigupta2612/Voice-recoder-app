@@ -104,8 +104,7 @@ def spec_audio(spec_img, spec_phase):
                                                     frame_length = 8064, hop_length_fft = 63)
     array_output = numpy_audio.reshape(1,numpy_audio.shape[0]*8064) * 10
     sf.write('./localDB/cleanAudio/clean_audio.wav', array_output[0,:], 8000)                                
-    file_path = './localDB/cleanAudio/clean_audio.wav'
-    return "Clean Audio Saved"
+    return 'clean_audio.wav'
 
     
 
