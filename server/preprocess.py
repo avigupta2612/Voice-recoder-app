@@ -109,5 +109,7 @@ def spec_audio(spec_img, spec_phase, filename):
     sf.write(os.path.join(DOWNLOAD_DIRECTORY,filename[:-4]+'_clean_audio.wav'), array_output[0,:], 8000)                                
     return filename[:-4]+'_clean_audio.wav'
 
-    
+def s2t_audio_to_array(path):
+    speech, sr = librosa.load(path, sr= 16000)
+    return speech
 
