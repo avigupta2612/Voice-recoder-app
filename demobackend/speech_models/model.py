@@ -2,6 +2,10 @@ import torch
 import torch.nn as nn
 import numpy as np
 import segmentation_models_pytorch as smp
+import os
+from demobackend.settings import BASE_DIR
+from transformers import Speech2TextForConditionalGeneration, Speech2TextProcessor
+from preprocess import s2t_audio_to_array
 
 def conv_block(no_layers, inp_filters, no_filters):
     layers=[]
@@ -56,7 +60,7 @@ class DenoisingModel(nn.Module):
 def model_out(spec_array, model='unet'):
     train_on_gpu = True if torch.cuda.is_available() else False
     cnn_auto_path = r'C:\Users\Avi\Desktop\speech denoising\model.pt'
-    unet_path = r'C:\Users\Avi\Desktop\speech denoising\unet-1.pt'
+    unet_path = os.path.join(BASE_DIR, 'speech_models', 'unet-1.pt')
 
     if model == 'cnn-auto':
         cnn_auto_model = DenoisingModel(64)
@@ -78,5 +82,14 @@ def model_out(spec_array, model='unet'):
         output = model_inp.numpy().squeeze() - model_out.detach().cpu().numpy().squeeze()
         return output
 
-       
-        
+def s2t_predictions(audio_file):
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    audio_array = s2t_audio_to_array(audio_file)
+    model = Speech2TextForConditionalGeneration.from_pretrained("facebook/s2t-small-librispeech-asr").to(device).eval()
+    processor = Speech2TextProcessor.from_pretrained("facebook/s2t-small-librispeech-asr", do_upper_case=True)
+    features = processor(audio_array, sampling_rate=16000, return_tensors="pt")
+    input_features = features.input_features.to(device)
+    attention_mask = features.attention_mask.to(device)
+    gen_tokens = model.generate(input_ids=input_features)
+    text = processor.batch_decode(gen_tokens, skip_special_tokens=True)
+    return text

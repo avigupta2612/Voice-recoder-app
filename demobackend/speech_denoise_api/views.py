@@ -12,5 +12,11 @@ class AudioFileViewSet(APIView):
     def post(self, request):
         file_path_object=request.data['uploaded_file']
         clean_audio_file_path = denoise_audio(file_path_object=file_path_object)
-        data = AudioFile.objects.last()
+        file_object = AudioFile.objects.last()
+        
+        data = {
+            #'userID': file_object.userID,
+            'originalAudio': file_object.input_audio.name,
+            'cleanAudio': file_object.clean_audio.name
+        }
         return Response(data,status=status.HTTP_201_CREATED)

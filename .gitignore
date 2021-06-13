@@ -1,3 +1,4 @@
 __pycache__/
 env
 node_modules
+demobackend/speech_models/unet-1.pt
