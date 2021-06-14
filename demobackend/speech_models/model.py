@@ -5,7 +5,7 @@ import segmentation_models_pytorch as smp
 import os
 from demobackend.settings import BASE_DIR
 from transformers import Speech2TextForConditionalGeneration, Speech2TextProcessor
-from preprocess import s2t_audio_to_array
+from speech_models.preprocess import s2t_audio_to_array
 
 def conv_block(no_layers, inp_filters, no_filters):
     layers=[]
@@ -92,4 +92,4 @@ def s2t_predictions(audio_file):
     attention_mask = features.attention_mask.to(device)
     gen_tokens = model.generate(input_ids=input_features)
     text = processor.batch_decode(gen_tokens, skip_special_tokens=True)
-    return text
+    return text[0]

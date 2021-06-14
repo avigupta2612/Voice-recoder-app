@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 import os
 from demobackend.settings import BASE_DIR
-from speech_models.utils import denoise_audio, s2t_predictions
+from speech_models.utils import denoise_audio
+from speech_models.model import s2t_predictions
 from .models import AudioFile
 
 
