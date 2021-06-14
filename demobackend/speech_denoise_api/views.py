@@ -17,8 +17,8 @@ class AudioFileViewSet(APIView):
         
         data = {
             #'userID': file_object.userID,
-            'originalAudio': file_object.input_audio.name,
-            'cleanAudio': file_object.clean_audio.name
+            'originalAudio': '/media/' + file_object.input_audio.name,
+            'cleanAudio': '/media/' + file_object.clean_audio.name
         }
         return Response(data,status=status.HTTP_201_CREATED)
 

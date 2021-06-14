@@ -110,7 +110,7 @@ def spec_audio(spec_img, spec_phase, filename):
                                                     frame_length = 8064, hop_length_fft = 63)
     array_output = numpy_audio.reshape(1,numpy_audio.shape[0]*8064) * 10
     sf.write(os.path.join(MEDIA_ROOT,'clean-audio',filename), array_output[0,:], 8000)                                
-    return os.path.join('clean-audio',filename)
+    return 'clean-audio/' + filename
 
  
 
