@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const HTTP = axios.create({
     // baseURL: `https://api.deepnoise.com/`,
-    baseURL: `https://65.1.3.74:8080/`,
+    baseURL: `http://65.1.3.74:8080/`,
     crossDomain: true,
     headers: {}
 })

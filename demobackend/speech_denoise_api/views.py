@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import os
 from demobackend.settings import BASE_DIR
-from speech_models.utils import denoise_audio
+from speech_models.utils import denoise_audio, s2t_predictions
 from .models import AudioFile
 
 
@@ -20,3 +20,12 @@ class AudioFileViewSet(APIView):
             'cleanAudio': file_object.clean_audio.name
         }
         return Response(data,status=status.HTTP_201_CREATED)
+
+class Speech2TextView(APIView):
+    def post(self, request):
+        audio_file = request.data['uploaded_file']
+        predicted_text = s2t_predictions(audio_file)
+        data = {
+            'text': predicted_text
+        }
+        return Response(data, status=status.HTTP_200_OK)
