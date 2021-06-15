@@ -6,6 +6,8 @@ import os
 from demobackend.settings import BASE_DIR
 from transformers import Speech2TextForConditionalGeneration, Speech2TextProcessor
 from speech_models.preprocess import s2t_audio_to_array
+import subprocess
+from speech_denoise_api.models import Speech2Text
 
 def conv_block(no_layers, inp_filters, no_filters):
     layers=[]
@@ -84,6 +86,13 @@ def model_out(spec_array, model='unet'):
 
 def s2t_predictions(audio_file):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    if audio_file.name.endswith('.mp3'):
+        audio_file_obj = Speech2Text.objects.create(input_audio = audio_file)
+        subprocess.call(['ffmpeg', '-i', os.path.join(BASE_DIR, 'media', 's2t_audio', audio_file.name),
+                        os.path.join(BASE_DIR, 'media', 
+                        's2t_audio', str(audio_file.name)[:-4] + '.wav')])
+        audio_file = os.path.join(BASE_DIR, 'media', 
+                    's2t_audio', str(audio_file.name)[:-4] + '.wav')
     audio_array = s2t_audio_to_array(audio_file)
     model = Speech2TextForConditionalGeneration.from_pretrained("facebook/s2t-small-librispeech-asr").to(device).eval()
     processor = Speech2TextProcessor.from_pretrained("facebook/s2t-small-librispeech-asr", do_upper_case=True)
@@ -92,4 +101,6 @@ def s2t_predictions(audio_file):
     attention_mask = features.attention_mask.to(device)
     gen_tokens = model.generate(input_ids=input_features)
     text = processor.batch_decode(gen_tokens, skip_special_tokens=True)
+    print(text)
+    #os.remove(audio_file)
     return text[0]
