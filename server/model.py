@@ -88,4 +88,4 @@ def s2t_predictions(audio_file):
     attention_mask = features.attention_mask.to(device)
     gen_tokens = model.generate(input_ids=input_features)
     text = processor.batch_decode(gen_tokens, skip_special_tokens=True)
-    return text
+    return **text

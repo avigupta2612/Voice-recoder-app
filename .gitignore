@@ -2,3 +2,5 @@ __pycache__/
 env
 node_modules
 demobackend/speech_models/unet-1.pt
+demobackend/speech_models/unet-2.pt
+demobackend/media/

@@ -8,9 +8,10 @@
 #     path('', include(router.urls))
 # ]
 from django.conf.urls import url
-from .views import AudioFileViewSet, Speech2TextView
+from .views import UploadAudioFileViewSet, Speech2TextView, DenoiseAudioFileViewSet
 
 urlpatterns = [
-    url('denoise_audio', AudioFileViewSet.as_view()),
+    url('upload_audio', UploadAudioFileViewSet.as_view()),
+    url('denoise_audio', DenoiseAudioFileViewSet.as_view()),
     url('convert_s2t', Speech2TextView.as_view())
 ]
