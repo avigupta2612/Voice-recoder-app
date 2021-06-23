@@ -7,7 +7,7 @@ class AudioFile(models.Model):
     input_audio_wav = models.FileField(upload_to='input-audio')
     input_audio_other = models.FileField(upload_to='input-audio', null= True, blank= True)
     clean_audio = models.FileField(upload_to='clean-audio')
-    userId = models.ForeignKey(User, on_delete=models.CASCADE, blank= True, null=True)
+    userId = models.EmailField(max_length=254, blank= True, null=True)
 
     def __str__(self):
         return self.id

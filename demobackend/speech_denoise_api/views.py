@@ -13,19 +13,39 @@ from .models import AudioFile
 class UploadAudioFileViewSet(APIView):
     def post(self, request):
         file_path_object=request.data['uploaded_file']
-        if file_path_object.name.endswith(".wav"):
-            audio_file_object = AudioFile.objects.create(input_audio_wav = file_path_object)  
-        else:
-            audio_file_object = AudioFile.objects.create(input_audio_other = file_path_object)
-            convert_mp3_to_wav(audio_file_object)
-        data = {
-            #'userID': file_object.userID,
-            #'recordingId': json.loads(request.data['body'])['recordingId'],
-            'id': audio_file_object.id,
-            'audioUrl': '/media/' + audio_file_object.input_audio_wav.name,
-            #'cleanAudio': '/media/' + file_object.clean_audio.name
-        }
-        print(data)
+        try:
+            email_id = request.data['email_id']
+            if file_path_object.name.endswith(".wav"):
+                audio_file_object = AudioFile.objects.create(input_audio_wav = file_path_object, 
+                                                            userId = email_id)
+                data = {
+                    'id': audio_file_object.id,
+                    'audioUrl': '/media/' + audio_file_object.input_audio_wav.name,
+                    'userId': audio_file_object.userId
+                }  
+            else:
+                audio_file_object = AudioFile.objects.create(input_audio_other = file_path_object,
+                                                            userId = email_id)
+                convert_mp3_to_wav(audio_file_object)
+                data = {
+                    'id': audio_file_object.id,
+                    'audioUrl': '/media/' + audio_file_object.input_audio_wav.name,
+                    'userId': audio_file_object.userId
+                }
+        except:
+            if file_path_object.name.endswith(".wav"):
+                audio_file_object = AudioFile.objects.create(input_audio_wav = file_path_object)
+                data = {
+                    'id': audio_file_object.id,
+                    'audioUrl': '/media/' + audio_file_object.input_audio_wav.name,
+                } 
+            else:
+                audio_file_object = AudioFile.objects.create(input_audio_other = file_path_object)
+                convert_mp3_to_wav(audio_file_object)
+                data = {
+                    'id': audio_file_object.id,
+                    'audioUrl': '/media/' + audio_file_object.input_audio_wav.name,
+                }
         return Response(data,status=status.HTTP_201_CREATED)
 
 class DenoiseAudioFileViewSet(APIView):
@@ -34,8 +54,6 @@ class DenoiseAudioFileViewSet(APIView):
         audio_file_object = AudioFile.objects.get(id = audio_id)
         clean_audio_file_path = denoise_audio(audio_file_object=audio_file_object)       
         data = {
-            #'userID': file_object.userID,
-            #'recordingId': json.loads(request.data['body'])['recordingId'],
             'id': audio_file_object.id,
             'cleanAudioUrl': '/media/' + audio_file_object.clean_audio.name
         }
@@ -50,4 +68,19 @@ class Speech2TextView(APIView):
         data = {
             'text': predicted_text
         }
+        return Response(data, status=status.HTTP_200_OK)
+
+class ShowUserRecordingsView(APIView):
+    def post(self, request):
+        email_id = request.data['email_id']
+        audio_file_object = AudioFile.objects.filter(userId = email_id)
+        data = []
+        for i, obj in enumerate(audio_file_object):
+            data.append({
+                "id" : obj.id,
+                "originalAudio" : '/media/' + obj.input_audio_wav.name,
+            })
+            if obj.clean_audio:
+                data[i]["cleanAudio"] = '/media/' + obj.clean_audio.name
+        
         return Response(data, status=status.HTTP_200_OK)

@@ -27,6 +27,7 @@ def audio_files_to_numpy(list_audio_files, sample_rate, frame_length, hop_length
     for file in list_audio_files:
         # open the audio file
         y, sr = librosa.load(file, sr=sample_rate)
+        y = np.concatenate((y, np.zeros(8000)))
         total_duration = librosa.get_duration(y=y, sr=sr)
 
         if (total_duration >= min_duration):
